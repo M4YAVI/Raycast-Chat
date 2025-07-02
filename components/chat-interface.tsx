@@ -1,49 +1,50 @@
-"use client"
+'use client';
 
-import { useChat } from "ai/react"
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Sparkles } from "lucide-react"
-import { MarkdownRenderer } from "./markdown-renderer"
-import { useApp } from "@/app/providers"
+import { useApp } from '@/app/providers';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useChat } from 'ai/react';
+import { Send, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MarkdownRenderer } from './markdown-renderer';
 
 const FOLLOW_UP_SUGGESTIONS = [
-  "Can you explain this in more detail?",
-  "What are the alternatives?",
-  "How can I implement this?",
-  "What are the best practices?",
-]
+  'Can you explain this in more detail?',
+  'What are the alternatives?',
+  'How can I implement this?',
+  'What are the best practices?',
+];
 
 export function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
-  })
-  const { sidebarOpen, setCommandPaletteOpen } = useApp()
-  const [followUps, setFollowUps] = useState<string[]>([])
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      api: '/api/chat',
+    });
+  const { sidebarOpen, setCommandPaletteOpen } = useApp();
+  const [followUps, setFollowUps] = useState<string[]>([]);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (messages.length > 0 && !isLoading) {
       // Generate contextual follow-ups based on the last message
-      const lastMessage = messages[messages.length - 1]
-      if (lastMessage.role === "assistant") {
-        setFollowUps(FOLLOW_UP_SUGGESTIONS)
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'assistant') {
+        setFollowUps(FOLLOW_UP_SUGGESTIONS);
       }
     }
-  }, [messages, isLoading])
+  }, [messages, isLoading]);
 
   useEffect(() => {
     // Auto-scroll to bottom
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
   const handleFollowUp = (suggestion: string) => {
-    handleInputChange({ target: { value: suggestion } } as any)
-  }
+    handleInputChange({ target: { value: suggestion } } as any);
+  };
 
   if (messages.length === 0) {
     return (
@@ -52,7 +53,9 @@ export function ChatInterface() {
           <div className="space-y-2">
             <Sparkles className="h-12 w-12 mx-auto text-blue-500" />
             <h1 className="text-2xl font-bold">Welcome to AI Chat</h1>
-            <p className="text-gray-400">Start a conversation or use keyboard shortcuts to navigate</p>
+            <p className="text-gray-400">
+              Start a conversation or use keyboard shortcuts to navigate
+            </p>
           </div>
 
           <div className="space-y-3 text-sm text-gray-500">
@@ -65,17 +68,22 @@ export function ChatInterface() {
               <span>Toggle Sidebar</span>
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <kbd className="px-2 py-1 bg-gray-800 rounded text-xs">⌘N</kbd>
+              <kbd className="px-2 py-1 bg-gray-800 rounded text-xs">
+                ⌘ Enter
+              </kbd>
               <span>New Chat</span>
             </div>
           </div>
 
-          <Button onClick={() => setCommandPaletteOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+          <Button
+            onClick={() => setCommandPaletteOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             Get Started
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -84,13 +92,24 @@ export function ChatInterface() {
       <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              key={message.id}
+              className={`flex ${
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
               <div
                 className={`max-w-[80%] rounded-lg p-4 ${
-                  message.role === "user" ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-100"
+                  message.role === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-800 text-gray-100'
                 }`}
               >
-                {message.role === "user" ? <p>{message.content}</p> : <MarkdownRenderer content={message.content} />}
+                {message.role === 'user' ? (
+                  <p>{message.content}</p>
+                ) : (
+                  <MarkdownRenderer content={message.content} />
+                )}
               </div>
             </div>
           ))}
@@ -102,11 +121,11 @@ export function ChatInterface() {
                   <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                   <div
                     className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.1s" }}
+                    style={{ animationDelay: '0.1s' }}
                   ></div>
                   <div
                     className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
+                    style={{ animationDelay: '0.2s' }}
                   ></div>
                 </div>
               </div>
@@ -148,12 +167,16 @@ export function ChatInterface() {
               className="flex-1 bg-gray-800 border-gray-600 focus:border-blue-500"
               disabled={isLoading}
             />
-            <Button type="submit" disabled={isLoading || !input.trim()} className="bg-blue-600 hover:bg-blue-700">
+            <Button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }
